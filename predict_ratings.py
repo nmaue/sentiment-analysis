@@ -9,9 +9,11 @@ def get_parser() -> ArgumentParser:
     parser: ArgumentParser = ArgumentParser(
         "Predict Ratings from training feature file and test feature file")
 
-    parser.add_argument("training_file", required=True)
-    parser.add_argument("test_file", required=True)
-    parser.add_argument("output_file", required=True)
+    parser.add_argument("training_file")
+    parser.add_argument("test_file")
+    parser.add_argument("output_file")
+    parser.add_argument("-v", "--verbose", default=False,
+                        required=False, action="store_true")
 
     return parser
 
@@ -29,10 +31,11 @@ def inner_main(args) -> None:
             testing_line: str = line.strip()
             testing_dict: Dict[str, Any] = json.loads(testing_line)
 
-            predictedRating = model.predict(testing_dict["features"])
+            predictedRating = model.predict([testing_dict["features"]])[0]
             output_dict = dict()
             output_dict["id"] = testing_dict["id"]
-            output_dict["predictedRating"] = predictedRating
+            output_dict["predictedRating"] = int(predictedRating)
+            print(output_dict)
 
             outbuffer.write(json.dumps(output_dict) + "\n")
 
@@ -46,12 +49,12 @@ def train_model(training_file: str) -> SVC:
         for line in training:
             training_line: str = line.strip()
             training_dict: Dict[str, Any] = json.loads(training_line)
-            score: int = training_dict["score"]
+            score: int = training_dict["rating"]
             scores.append(score)
             features: List[int] = training_dict["features"]
             features_lists.append(features)
-    model: SVC = SVC()
-    model.fit(scores, features_lists)
+    model: SVC = SVC(gamma='auto')
+    model.fit(features_lists, scores)
     return model
 
 

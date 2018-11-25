@@ -23,8 +23,10 @@ def get_parser() -> ArgumentParser:
     parser: ArgumentParser = ArgumentParser(
         "Score the predicted of a test file")
 
-    parser.add_argument("test_file", required=True)
-    parser.add_argument("answer_file", required=True)
+    parser.add_argument("test_file")
+    parser.add_argument("answer_file")
+    parser.add_argument("-v", "--verbose", default=False,
+                        required=False, action="store_true")
 
     return parser
 

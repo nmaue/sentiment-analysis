@@ -8,8 +8,8 @@ def get_parser() -> ArgumentParser:
     parser: ArgumentParser = ArgumentParser(
         "Build a feature file from a file with review text")
 
-    parser.add_argument("in_file", required=True)
-    parser.add_argument("out_file", required=True)
+    parser.add_argument("in_file")
+    parser.add_argument("out_file")
     parser.add_argument("-v", "--verbose", default=False,
                         required=False, action="store_true")
 
