@@ -30,8 +30,9 @@ def get_parser() -> ArgumentParser:
 def inner_main(args) -> None:
     in_file: str = args.in_file
     out_file: str = args.out_file
+    build_vocab = args.vocab_out is not None
 
-    cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file)
+    cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file, build_vocab)
 
     if args.vocab_in is not None:
         vocab_file: str = args.vocab_in
@@ -55,7 +56,9 @@ def inner_main(args) -> None:
 
 
 def clean_reviews_and_get_vocab(
-        in_file: str) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
+    in_file: str,
+    build_vocab: bool
+) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
     ret: List[Dict[str, Any]] = []
     counter: Counter = Counter()
     with open(in_file, "r") as inbuffer:
@@ -68,13 +71,16 @@ def clean_reviews_and_get_vocab(
             counter.update(input_dict["reviewText"])
             ret.append(input_dict)
 
-    elements = counter.most_common(VOCAB_SIZE)
-    ret_vocab = dict()
-    i = 0
+    ret_vocab = None
 
-    for word in elements:
-        ret_vocab[word[0]] = i
-        i += 1
+    if build_vocab:
+        ret_vocab = dict()
+        elements = counter.most_common(VOCAB_SIZE)
+        i = 0
+
+        for word in elements:
+            ret_vocab[word[0]] = i
+            i += 1
 
     return ret, ret_vocab
 
