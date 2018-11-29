@@ -1,7 +1,7 @@
 # pyre-strict
 import json
 from argparse import ArgumentParser
-from typing import List, Dict, Any, Tuple, Set
+from typing import List, Dict, Any, Tuple
 from nltk.tokenize import wordpunct_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
@@ -19,6 +19,10 @@ def get_parser() -> ArgumentParser:
     parser.add_argument("out_file")
     parser.add_argument("-v", "--verbose", default=False,
                         required=False, action="store_true")
+    parser.add_argument("--build-vocab", "-bv", required=False,
+                        default=None, dest="vocab_out")
+    parser.add_argument("--read-vocab", "-rv", required=False,
+                        default=None, dest="vocab_in")
 
     return parser
 
@@ -28,6 +32,16 @@ def inner_main(args) -> None:
     out_file: str = args.out_file
 
     cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file)
+
+    if args.vocab_in is not None:
+        vocab_file: str = args.vocab_in
+        vocab = read_vocab(vocab_file)
+        # Read vocab in and overwrite
+
+    if args.vocab_out is not None:
+        vocab_file: str = args.vocab_out
+        store_vocab(vocab_file, vocab)
+        # Write vocab out
 
     with open(out_file, "w") as outbuffer:
         for review_dict in cleaned_reviews:
@@ -80,10 +94,37 @@ def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
     return ret
 
 
+def read_vocab(vocab_file: str) -> Dict[str, int]:
+    ret_dict: Dict[str, int] = dict()
+    with open(vocab_file, 'r') as vocabbuffer:
+        vocab_string = vocabbuffer.read().strip()
+        ret_dict: Dict[str, int] = json.loads(vocab_string)
+    return ret_dict
+
+
+def store_vocab(vocab_file: str, vocab: Dict[str, int]) -> None:
+    vocab_string: str = json.dumps(vocab)
+    with open(vocab_file, 'w') as vocabbuffer:
+        vocabbuffer.write(vocab_string)
+
+
+def validate_args(args) -> bool:
+    if args.vocab_in is None and args.vocab_out is None:
+        print("Must include either build or read vocab file")
+        return False
+
+    if args.vocab_in is not None and args.vocab_out is not None:
+        print("Only include either build or read voacb file")
+        return False
+
+    return True
+
+
 def main() -> None:
     parser = get_parser()
     args = parser.parse_args()
-    inner_main(args)
+    if validate_args(args):
+        inner_main(args)
 
 
 if __name__ == '__main__':
