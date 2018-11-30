@@ -3,6 +3,7 @@ import json
 from argparse import ArgumentParser
 from typing import List, Any, Dict
 from sklearn.svm import LinearSVC
+from sklearn.multiclass import OneVsRestClassifier
 
 
 def get_parser() -> ArgumentParser:
@@ -21,7 +22,7 @@ def get_parser() -> ArgumentParser:
 def inner_main(args) -> None:
     """Train the model and predict each in test file"""
     training_file: str = args.training_file
-    model: LinearSVC = train_model(training_file, args.verbose)
+    model: OneVsRestClassifier = train_model(training_file, args.verbose)
 
     test_file: str = args.test_file
     output_file: str = args.output_file
@@ -42,7 +43,7 @@ def inner_main(args) -> None:
     outbuffer.close()
 
 
-def train_model(training_file: str, verbose: bool) -> LinearSVC:
+def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
     """Iteralte over each line to add features to list and overall ratings"""
     scores: List[int] = []
     features_lists: List[List[int]] = []
@@ -57,7 +58,7 @@ def train_model(training_file: str, verbose: bool) -> LinearSVC:
 
     # Create and fit model
     verbose_int: int = 1 if verbose else 0
-    model: LinearSVC = LinearSVC(verbose=verbose_int)
+    model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), -1)
     model.fit(features_lists, scores)
     return model
 
