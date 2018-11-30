@@ -36,7 +36,6 @@ def inner_main(args) -> None:
             output_dict = dict()
             output_dict["id"] = testing_dict["id"]
             output_dict["predictedRating"] = float(predictedRating)
-            print(output_dict)
 
             outbuffer.write(json.dumps(output_dict) + "\n")
 
