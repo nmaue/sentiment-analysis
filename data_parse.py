@@ -1,6 +1,12 @@
 import json
 import random
 import copy
+import argparse
+
+parser = argparse.ArgumentParser("split the input into separate files")
+parser.add_argument("input_file")
+
+args = parser.parse_args()
 
 # output_file = open("cleaned_data.json", "w")
 
@@ -17,7 +23,7 @@ test_file_1 = open("test_data_review.json", "w")
 test_file_2 = open("test_data_rating.json", "w")
 
 
-input_file = open("small_small_data.json", "r")
+input_file = open(args.input_file, "r")
 input_file = input_file.read()
 
 split_input_file = input_file.split("\n")
