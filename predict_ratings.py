@@ -21,7 +21,7 @@ def get_parser() -> ArgumentParser:
 def inner_main(args) -> None:
     """Train the model and predict each in test file"""
     training_file: str = args.training_file
-    model: LinearSVC = train_model(training_file)
+    model: LinearSVC = train_model(training_file, args.verbose)
 
     test_file: str = args.test_file
     output_file: str = args.output_file
@@ -43,7 +43,7 @@ def inner_main(args) -> None:
     outbuffer.close()
 
 
-def train_model(training_file: str) -> LinearSVC:
+def train_model(training_file: str, verbose: bool) -> LinearSVC:
     """Iteralte over each line to add features to list and overall ratings"""
     scores: List[int] = []
     features_lists: List[List[int]] = []
@@ -57,7 +57,8 @@ def train_model(training_file: str) -> LinearSVC:
             features_lists.append(features)
 
     # Create and fit model
-    model: LinearSVC = LinearSVC()
+    verbose_int: int = 1 if verbose else 0
+    model: LinearSVC = LinearSVC(verbose=verbose_int)
     model.fit(features_lists, scores)
     return model
 
