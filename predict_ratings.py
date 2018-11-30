@@ -2,7 +2,7 @@
 import json
 from argparse import ArgumentParser
 from typing import List, Any, Dict
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 
 
 def get_parser() -> ArgumentParser:
@@ -21,7 +21,7 @@ def get_parser() -> ArgumentParser:
 def inner_main(args) -> None:
     """Train the model and predict each in test file"""
     training_file: str = args.training_file
-    model: SVC = train_model(training_file)
+    model: LinearSVC = train_model(training_file)
 
     test_file: str = args.test_file
     output_file: str = args.output_file
@@ -43,7 +43,7 @@ def inner_main(args) -> None:
     outbuffer.close()
 
 
-def train_model(training_file: str) -> SVC:
+def train_model(training_file: str) -> LinearSVC:
     """Iteralte over each line to add features to list and overall ratings"""
     scores: List[int] = []
     features_lists: List[List[int]] = []
@@ -57,7 +57,7 @@ def train_model(training_file: str) -> SVC:
             features_lists.append(features)
 
     # Create and fit model
-    model: SVC = SVC(gamma='auto')
+    model: LinearSVC = LinearSVC()
     model.fit(features_lists, scores)
     return model
 
