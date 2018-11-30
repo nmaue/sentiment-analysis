@@ -8,10 +8,13 @@ from collections import Counter
 
 stopwords = set(stopwords.words('english'))
 
+# Max size of vocab
 VOCAB_SIZE: int = 300
 
 
 def get_parser() -> ArgumentParser:
+    """Define the command line args (verbose unused for now)"""
+
     parser: ArgumentParser = ArgumentParser(
         "Build a feature file from a file with review text")
 
@@ -28,30 +31,34 @@ def get_parser() -> ArgumentParser:
 
 
 def inner_main(args) -> None:
+    """Run the main function"""
+
     in_file: str = args.in_file
     out_file: str = args.out_file
     build_vocab = args.vocab_out is not None
 
+    # Get cleaned reviews and vocab dict
     cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file, build_vocab)
 
     if args.vocab_in is not None:
+        # Read vocab in and overwrite
         vocab_file: str = args.vocab_in
         vocab = read_vocab(vocab_file)
-        # Read vocab in and overwrite
 
     if args.vocab_out is not None:
+        # Write vocab to file
         vocab_file: str = args.vocab_out
         store_vocab(vocab_file, vocab)
-        # Write vocab out
 
     with open(out_file, "w") as outbuffer:
+        # For each review get featires and write to file
         for review_dict in cleaned_reviews:
             output_dict = dict()
             output_dict["features"] = get_features(
                 review_dict["reviewText"], vocab)
             output_dict["id"] = review_dict["id"]
-            if "rating" in review_dict:
-                output_dict["rating"] = review_dict["rating"]
+            if "overall" in review_dict:
+                output_dict["overall"] = review_dict["overall"]
             outbuffer.write(json.dumps(output_dict) + "\n")
 
 
@@ -59,6 +66,17 @@ def clean_reviews_and_get_vocab(
     in_file: str,
     build_vocab: bool
 ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
+    """
+    Iterate over the input file
+        Tokenize review
+        add all tokens to counter
+        add review dict to cleaned review list
+
+    Get most common tokens and assign them an index
+
+    returns list of cleaned review dicts and the vocab dict
+    """
+
     ret: List[Dict[str, Any]] = []
     counter: Counter = Counter()
     with open(in_file, "r") as inbuffer:
@@ -66,18 +84,26 @@ def clean_reviews_and_get_vocab(
             stripped_line: str = line.strip()
             input_dict: Dict[str, Any] = json.loads(stripped_line)
             reviewText: str = input_dict["reviewText"]
+
+            # Clean and tokenize this review
             input_dict["reviewText"] = clean_and_tokenize_review(reviewText)
 
+            # add tokens to counter
             counter.update(input_dict["reviewText"])
+
+            # add to return list
             ret.append(input_dict)
 
     ret_vocab = None
 
     if build_vocab:
         ret_vocab = dict()
+
+        # Get most common tokens
         elements = counter.most_common(VOCAB_SIZE)
         i = 0
 
+        # Assign each an index
         for word in elements:
             ret_vocab[word[0]] = i
             i += 1
@@ -86,12 +112,18 @@ def clean_reviews_and_get_vocab(
 
 
 def clean_and_tokenize_review(review_text: str) -> List[str]:
-    tokens: List[str] = wordpunct_tokenize(review_text)
+    """
+    Uses wordpunct_tokenize to keep punctuation groups together
+    # https://www.nltk.org/api/nltk.tokenize.html#nltk.tokenize.regexp.WordPunctTokenizer
 
+    Removes nltk stopwords from token list
+    """
+    tokens: List[str] = wordpunct_tokenize(review_text)
     return [token for token in tokens if token not in stopwords]
 
 
 def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
+    """Check if token in vocab, if yes set index to 1"""
     ret: List[int] = [0 for x in range(len(vocab))]
     for token in review:
         if token in vocab:
@@ -101,6 +133,7 @@ def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
 
 
 def read_vocab(vocab_file: str) -> Dict[str, int]:
+    """Create vocab dict from file, to be consistent"""
     ret_dict: Dict[str, int] = dict()
     with open(vocab_file, 'r') as vocabbuffer:
         vocab_string = vocabbuffer.read().strip()
@@ -109,6 +142,7 @@ def read_vocab(vocab_file: str) -> Dict[str, int]:
 
 
 def store_vocab(vocab_file: str, vocab: Dict[str, int]) -> None:
+    """Write the vocab dict to a file"""
     vocab_string: str = json.dumps(vocab)
     with open(vocab_file, 'w') as vocabbuffer:
         vocabbuffer.write(vocab_string)

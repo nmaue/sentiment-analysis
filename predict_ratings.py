@@ -19,6 +19,7 @@ def get_parser() -> ArgumentParser:
 
 
 def inner_main(args) -> None:
+    """Train the model and predict each in test file"""
     training_file: str = args.training_file
     model: SVC = train_model(training_file)
 
@@ -34,7 +35,7 @@ def inner_main(args) -> None:
             predictedRating = model.predict([testing_dict["features"]])[0]
             output_dict = dict()
             output_dict["id"] = testing_dict["id"]
-            output_dict["predictedRating"] = int(predictedRating)
+            output_dict["predictedRating"] = float(predictedRating)
             print(output_dict)
 
             outbuffer.write(json.dumps(output_dict) + "\n")
@@ -43,16 +44,19 @@ def inner_main(args) -> None:
 
 
 def train_model(training_file: str) -> SVC:
+    """Iteralte over each line to add features to list and overall ratings"""
     scores: List[int] = []
     features_lists: List[List[int]] = []
     with open(training_file) as training:
         for line in training:
             training_line: str = line.strip()
             training_dict: Dict[str, Any] = json.loads(training_line)
-            score: int = training_dict["rating"]
+            score: int = training_dict["overall"]
             scores.append(score)
             features: List[int] = training_dict["features"]
             features_lists.append(features)
+
+    # Create and fit model
     model: SVC = SVC(gamma='auto')
     model.fit(features_lists, scores)
     return model

@@ -5,6 +5,7 @@ from typing import Dict, Tuple
 
 
 def score(predicted: int, answer: int) -> Tuple[int, int]:
+    """Use binary and complete scoring"""
     complete: int = 0
     binary: int = 0
     if predicted == answer:
