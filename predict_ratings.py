@@ -22,25 +22,45 @@ def get_parser() -> ArgumentParser:
 def inner_main(args) -> None:
     """Train the model and predict each in test file"""
     training_file: str = args.training_file
+
+    if args.verbose:
+        print("Beginning to train model")
     model: OneVsRestClassifier = train_model(training_file, args.verbose)
 
     test_file: str = args.test_file
     output_file: str = args.output_file
-    outbuffer = open(output_file, 'w')
+
+    id_list: List[Any] = []
+    feature_list: List[Any] = []
+    prediction_list: List[float] = []
+
+    if args.verbose:
+        print("Starting testing")
 
     with open(test_file) as testing:
         for line in testing:
             testing_line: str = line.strip()
             testing_dict: Dict[str, Any] = json.loads(testing_line)
 
-            predictedRating = model.predict([testing_dict["features"]])[0]
-            output_dict = dict()
-            output_dict["id"] = testing_dict["id"]
-            output_dict["predictedRating"] = float(predictedRating)
+            id_list.append(testing_dict["id"])
+            feature_list.append(testing_dict["features"])
 
-            outbuffer.write(json.dumps(output_dict) + "\n")
+    if args.verbose:
+        print("Test file read, begin prediction")
 
-    outbuffer.close()
+    prediction_list = model.predict(feature_list)
+
+    if args.verbose:
+        print("All predictions made, writing to file!")
+
+    with open(output_file, 'w') as outbuffer:
+        i: int = 0
+        for id in id_list:
+            out_dict: Dict[str, Any] = dict()
+            out_dict["id"] = id
+            out_dict["predictedRating"] = float(prediction_list[i])
+            i += 1
+            outbuffer.write(json.dumps(out_dict) + "\n")
 
 
 def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
@@ -56,10 +76,17 @@ def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
             features: List[int] = training_dict["features"]
             features_lists.append(features)
 
+    if verbose:
+        print("Training file read, model fitting go!")
+
     # Create and fit model
     verbose_int: int = 1 if verbose else 0
-    model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), -1)
+    model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), 60)
     model.fit(features_lists, scores)
+
+    if verbose:
+        print("Model is fit!")
+
     return model
 
 
