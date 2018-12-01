@@ -1,3 +1,15 @@
+"""
+Basic bag of words using 1 or 0 for present, top 300 word vocab
+Results on the corpus in git
+
+5 Point Match Rating: 43955 out of 77105
+5 Point Accuracy: 0.5700667920368329
+
+Binary Match Rating: 68180 out of 77105
+Binary Accuracy: 0.8842487517022243
+
+"""
+
 # pyre-strict
 import json
 from argparse import ArgumentParser
