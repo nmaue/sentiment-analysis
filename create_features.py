@@ -1,6 +1,6 @@
 """
 Basic bag of words using 1 or 0 for present, top 300 word vocab
-Results on the corpus in git
+Results on the half corpus
 
 5 Point Match Rating: 43955 out of 77105
 5 Point Accuracy: 0.5700667920368329
