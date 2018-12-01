@@ -50,7 +50,7 @@ def inner_main(args) -> None:
                 raise Exception("Test ID on line does not match Answer ID")
 
             complete, binary = score(
-                test_dict["predictedRating"], answer_dict["rating"])
+                test_dict["predictedRating"], answer_dict["overall"])
 
             complete_total += complete
             binary_total += binary
