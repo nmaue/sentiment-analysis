@@ -40,17 +40,27 @@ def inner_main(args) -> None:
     # Get cleaned reviews and vocab dict
     cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file, build_vocab)
 
+    if args.verbose:
+        print("Reviews cleaned")
+
     if args.vocab_in is not None:
         # Read vocab in and overwrite
         vocab_file: str = args.vocab_in
         vocab = read_vocab(vocab_file)
+        if args.verbose:
+            print("Vocab read in")
 
     if args.vocab_out is not None:
         # Write vocab to file
         vocab_file: str = args.vocab_out
         store_vocab(vocab_file, vocab)
+        if args.verbose:
+            print("Vocab file written")
 
     with open(out_file, "w") as outbuffer:
+        if args.verbose:
+            print("Starting to build features")
+
         # For each review get featires and write to file
         for review_dict in cleaned_reviews:
             output_dict = dict()
