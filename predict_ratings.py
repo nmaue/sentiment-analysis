@@ -81,7 +81,7 @@ def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
 
     # Create and fit model
     verbose_int: int = 1 if verbose else 0
-    model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), 60)
+    model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), 56)
     model.fit(features_lists, scores)
 
     if verbose:
