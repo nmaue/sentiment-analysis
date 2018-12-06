@@ -41,6 +41,9 @@ def inner_main(args) -> None:
     out_file: str = args.out_file
     build_vocab = args.vocab_out is not None
 
+    if args.verbose:
+        print("Starting to clean reviews")
+
     # Get cleaned reviews and vocab dict
     cleaned_reviews, vocab = clean_reviews_and_get_vocab(in_file, build_vocab)
 
@@ -74,6 +77,9 @@ def inner_main(args) -> None:
             if "overall" in review_dict:
                 output_dict["overall"] = review_dict["overall"]
             outbuffer.write(json.dumps(output_dict) + "\n")
+
+    if args.verbose:
+        print("Features written")
 
 
 def clean_reviews_and_get_vocab(
