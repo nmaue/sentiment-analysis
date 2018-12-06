@@ -1,5 +1,11 @@
 """
 Handles Negation
+
+5 Point Match Rating: 44120 out of 77519
+5 Point Accuracy: 0.5691507888388653
+
+Binary Match Rating: 68659 out of 77519
+Binary Accuracy: 0.8857054399566557
 """
 # pyre-strict
 import json
