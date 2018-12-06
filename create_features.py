@@ -1,15 +1,6 @@
 """
-Basic bag of words using 1 or 0 for present, top 300 word vocab
-Results on the half corpus
-
-5 Point Match Rating: 43955 out of 77105
-5 Point Accuracy: 0.5700667920368329
-
-Binary Match Rating: 68180 out of 77105
-Binary Accuracy: 0.8842487517022243
-
+Handles Negation
 """
-
 # pyre-strict
 import json
 from argparse import ArgumentParser
@@ -17,6 +8,7 @@ from typing import List, Dict, Any, Tuple
 from nltk.tokenize import wordpunct_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
+from nltk.sentiment.util import mark_negation
 
 stopwords = set(stopwords.words('english'))
 
@@ -141,7 +133,8 @@ def clean_and_tokenize_review(review_text: str) -> List[str]:
     Removes nltk stopwords from token list
     """
     tokens: List[str] = wordpunct_tokenize(review_text)
-    return [token for token in tokens if token not in stopwords]
+    mark_negation(tokens, shallow=True)
+    return [token for token in tokens if token.lower() not in stopwords]
 
 
 def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
