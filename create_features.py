@@ -1,5 +1,12 @@
 """
 Handles Negation and uses word frequency
+
+5 Point Match Rating: 43491 out of 77519
+5 Point Accuracy: 0.5610366490795805
+
+Binary Match Rating: 68561 out of 77519
+Binary Accuracy: 0.8844412337620454
+
 """
 # pyre-strict
 import json
