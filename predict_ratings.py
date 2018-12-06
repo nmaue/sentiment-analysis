@@ -62,6 +62,9 @@ def inner_main(args) -> None:
             i += 1
             outbuffer.write(json.dumps(out_dict) + "\n")
 
+    if args.verbose:
+        print("Everything written to file")
+
 
 def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
     """Iteralte over each line to add features to list and overall ratings"""
