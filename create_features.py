@@ -1,5 +1,5 @@
 """
-Handles Negation
+Handles Negation and uses word frequency
 """
 # pyre-strict
 import json
@@ -146,9 +146,9 @@ def clean_and_tokenize_review(review_text: str) -> List[str]:
 def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
     """Check if token in vocab, if yes set index to 1"""
     ret: List[int] = [0 for x in range(len(vocab))]
-    for token in review:
-        if token in vocab:
-            ret[vocab[token]] = 1
+    review_counter: Counter = Counter(review)
+    for word, position in vocab.items():
+        ret[position] = review_counter[word]
 
     return ret
 
