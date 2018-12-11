@@ -1,7 +1,7 @@
 """
 Handles Negation and uses binary bag
 
-Sets min occurences of word to 500
+Vocab 1000
 
 """
 # pyre-strict
@@ -15,8 +15,8 @@ from nltk.sentiment.util import mark_negation
 
 stopwords = set(stopwords.words('english'))
 
-# Min occurences for word to be in vocab
-MIN_COUNT: int = 500
+# Max size of vocab
+VOCAB_SIZE: int = 1000
 
 
 def get_parser() -> ArgumentParser:
@@ -123,14 +123,12 @@ def clean_reviews_and_get_vocab(
         ret_vocab = dict()
 
         # Get most common tokens
-        elements = counter.most_common()
+        elements = counter.most_common(VOCAB_SIZE)
         i = 0
 
         # Assign each an index
-        for word, count in elements:
-            if count < MIN_COUNT:
-                continue
-            ret_vocab[word] = i
+        for word in elements:
+            ret_vocab[word[0]] = i
             i += 1
 
     return ret, ret_vocab
