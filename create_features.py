@@ -1,11 +1,7 @@
 """
-Handles Negation and uses word frequency
+Handles Negation and uses binary bag
 
-5 Point Match Rating: 43491 out of 77519
-5 Point Accuracy: 0.5610366490795805
-
-Binary Match Rating: 68561 out of 77519
-Binary Accuracy: 0.8844412337620454
+Sets min occurences of word to 100
 
 """
 # pyre-strict
@@ -19,8 +15,8 @@ from nltk.sentiment.util import mark_negation
 
 stopwords = set(stopwords.words('english'))
 
-# Max size of vocab
-VOCAB_SIZE: int = 300
+# Min occurences for word to be in vocab
+MIN_COUNT: int = 100
 
 
 def get_parser() -> ArgumentParser:
@@ -127,12 +123,14 @@ def clean_reviews_and_get_vocab(
         ret_vocab = dict()
 
         # Get most common tokens
-        elements = counter.most_common(VOCAB_SIZE)
+        elements = counter.most_common()
         i = 0
 
         # Assign each an index
-        for word in elements:
-            ret_vocab[word[0]] = i
+        for word, count in elements:
+            if count < MIN_COUNT:
+                continue
+            ret_vocab[word] = i
             i += 1
 
     return ret, ret_vocab
@@ -153,9 +151,9 @@ def clean_and_tokenize_review(review_text: str) -> List[str]:
 def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
     """Check if token in vocab, if yes set index to 1"""
     ret: List[int] = [0 for x in range(len(vocab))]
-    review_counter: Counter = Counter(review)
-    for word, position in vocab.items():
-        ret[position] = review_counter[word]
+    for token in review:
+        if token in vocab:
+            ret[vocab[token]] = 1
 
     return ret
 
