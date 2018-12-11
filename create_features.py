@@ -1,13 +1,7 @@
 """
 Handles Negation and uses binary bag
 
-Vocab 1000
-
-5 Point Match Rating: 46063 out of 77519
-5 Point Accuracy: 0.5942156116564972
-
-Binary Match Rating: 69693 out of 77519
-Binary Accuracy: 0.899044105316116
+Vocab 10000
 """
 # pyre-strict
 import json
@@ -21,7 +15,7 @@ from nltk.sentiment.util import mark_negation
 stopwords = set(stopwords.words('english'))
 
 # Max size of vocab
-VOCAB_SIZE: int = 1000
+VOCAB_SIZE: int = 10000
 
 
 def get_parser() -> ArgumentParser:
