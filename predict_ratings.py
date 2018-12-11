@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 from typing import List, Any, Dict
 from sklearn.svm import LinearSVC
 from sklearn.multiclass import OneVsRestClassifier
+from numpy import array
+from scipy.sparse import csr_matrix
 
 
 def get_parser() -> ArgumentParser:
@@ -43,12 +45,12 @@ def inner_main(args) -> None:
             testing_dict: Dict[str, Any] = json.loads(testing_line)
 
             id_list.append(testing_dict["id"])
-            feature_list.append(testing_dict["features"])
+            feature_list.append(array(testing_dict["features"]))
 
     if args.verbose:
         print("Test file read, begin prediction")
 
-    prediction_list = model.predict(feature_list)
+    prediction_list = model.predict(csr_matrix(feature_list))
 
     if args.verbose:
         print("All predictions made, writing to file!")
@@ -69,14 +71,14 @@ def inner_main(args) -> None:
 def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
     """Iteralte over each line to add features to list and overall ratings"""
     scores: List[int] = []
-    features_lists: List[List[int]] = []
+    features_lists: List[Any] = []
     with open(training_file) as training:
         for line in training:
             training_line: str = line.strip()
             training_dict: Dict[str, Any] = json.loads(training_line)
             score: int = training_dict["overall"]
             scores.append(score)
-            features: List[int] = training_dict["features"]
+            features = array(training_dict["features"])
             features_lists.append(features)
 
     if verbose:
@@ -85,7 +87,7 @@ def train_model(training_file: str, verbose: bool) -> OneVsRestClassifier:
     # Create and fit model
     verbose_int: int = 1 if verbose else 0
     model: LinearSVC = OneVsRestClassifier(LinearSVC(verbose=verbose_int), 56)
-    model.fit(features_lists, scores)
+    model.fit(csr_matrix(features_lists), scores)
 
     if verbose:
         print("Model is fit!")
