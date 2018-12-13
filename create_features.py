@@ -1,11 +1,5 @@
 """
-Uses binary bag of top 300 words in sentiment words list
-
-5 Point Match Rating: 44511 out of 77519
-5 Point Accuracy: 0.5741947135540965
-
-Binary Match Rating: 69203 out of 77519
-Binary Accuracy: 0.8927230743430643
+Uses binary bag of top 1000 words in sentiment words list
 
 """
 # pyre-strict
@@ -21,7 +15,7 @@ stopwords = set(stopwords.words('english'))
 sentiment_words = set(open("sentiment_words.txt").read().splitlines())
 
 # Max size of vocab
-VOCAB_SIZE: int = 300
+VOCAB_SIZE: int = 1000
 
 
 def get_parser() -> ArgumentParser:
