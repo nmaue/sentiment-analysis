@@ -1,6 +1,12 @@
 """
 Uses binary bag of top 1000 words in sentiment words list
 
+5 Point Match Rating: 45717 out of 77519
+5 Point Accuracy: 0.58975218978573
+
+Binary Match Rating: 70112 out of 77519
+Binary Accuracy: 0.9044492318012358
+
 """
 # pyre-strict
 import json
