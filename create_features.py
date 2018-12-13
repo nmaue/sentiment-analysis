@@ -1,7 +1,6 @@
 """
-Handles Negation and uses binary bag
+Uses binary bag of top 300 words in sentiment words list
 
-Vocab 10000
 """
 # pyre-strict
 import json
@@ -13,9 +12,10 @@ from collections import Counter
 from nltk.sentiment.util import mark_negation
 
 stopwords = set(stopwords.words('english'))
+sentiment_words = set(open("sentiment_words.txt").read().splitlines())
 
 # Max size of vocab
-VOCAB_SIZE: int = 10000
+VOCAB_SIZE: int = 300
 
 
 def get_parser() -> ArgumentParser:
@@ -122,13 +122,17 @@ def clean_reviews_and_get_vocab(
         ret_vocab = dict()
 
         # Get most common tokens
-        elements = counter.most_common(VOCAB_SIZE)
+        elements = counter.most_common()
         i = 0
 
         # Assign each an index
-        for word in elements:
-            ret_vocab[word[0]] = i
-            i += 1
+        for word, count in elements:
+            if i >= VOCAB_SIZE:
+                break
+
+            if word in sentiment_words:
+                ret_vocab[word] = i
+                i += 1
 
     return ret, ret_vocab
 
@@ -142,7 +146,15 @@ def clean_and_tokenize_review(review_text: str) -> List[str]:
     """
     tokens: List[str] = wordpunct_tokenize(review_text)
     mark_negation(tokens, shallow=True)
-    return [token for token in tokens if token.lower() not in stopwords]
+    # transform to normalize words
+    ret = []
+    for token in tokens:
+        split_token = token.split("_")
+        split_token[0] = split_token[0].lower()
+        if split_token[0] in stopwords:
+            continue
+        ret.append("_".join(split_token))
+    return ret
 
 
 def get_features(review: List[str], vocab: Dict[str, int]) -> List[int]:
